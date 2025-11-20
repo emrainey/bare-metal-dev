@@ -1,0 +1,34 @@
+FROM archlinux/archlinux:latest
+# Update pacman and install a package (e.g., git)
+RUN pacman --sync --refresh --sysupgrade --noconfirm
+# Common Tools and Libraries
+RUN pacman --sync --refresh --noconfirm htop tree tmux screen vim nano screen curl wget openssl bash zsh sudo
+# Compilers & Debuggers (Host)
+RUN pacman --sync --refresh --noconfirm gcc gdb cgdb llvm lldb openmp
+# Compilers & Debuggers (ARM)
+RUN pacman --sync --refresh --noconfirm arm-none-eabi-gcc arm-none-eabi-gdb arm-none-eabi-newlib
+# Dev tools
+RUN pacman --sync --refresh --noconfirm lcov doxygen graphviz git cmake make ninja
+# Python3 and Pip3
+RUN pacman --sync --refresh --noconfirm python python-pip python-virtualenv
+# Remove all the packages
+RUN pacman --sync --clean --noconfirm
+# Define workspace
+ENV WS /ws
+# Define working directory
+WORKDIR ${WS}
+# Create a non-root user and add as sudoer
+RUN useradd -m -s /bin/zsh dev && \
+    usermod -aG wheel dev && \
+    echo "dev ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# Switch to dev user
+USER dev
+# Upgrade Pip and create virtualenv
+RUN python3 -m venv $HOME/venv
+# Create virtual environment and upgrade pip
+RUN source $HOME/venv/bin/activate && pip install --upgrade pip
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# ENV PROMPT='%n@%m %~ %# '
+# ENTRYPOINT [ "executable" ]
+CMD [ "/bin/zsh" ]

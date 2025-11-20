@@ -1,0 +1,16 @@
+FROM ubuntu:24.04
+
+ENV LANG=en_US.utf8
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Adds some utilities to the image then
+# adds the Host compiler, and the cross compiler and distcc
+RUN apt update
+RUN apt install -y joe vim zsh tmux screen htop git
+RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi make remake cmake mold
+RUN apt autoremove --purge -y
+RUN apt autoclean -y
+RUN rm -rf /var/cache/apt/* /tmp/*
+
+ENV HOME=/home/emrainey
+RUN useradd -s /bin/zsh -m emrainey

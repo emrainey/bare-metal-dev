@@ -1,0 +1,29 @@
+FROM alpine:latest
+# Common Tools and Libraries
+RUN apk update && apk add sudo tmux vim joe screen htop ncurses zsh curl wget openssl bash zsh
+# Dev Tools
+RUN apk update && apk add git make cmake samurai musl-dev
+# Dev Adjacent Tools
+RUN apk update && apk add lcov gcovr doxygen graphviz
+# Compilers (GCC)
+RUN apk update && apk add gcc g++ gdb cgdb
+# Compilers (LLVM)
+RUN apk update && apk add clang clang-rtlib compiler-rt llvm llvm-runtimes lldb
+# Compilers (GCC-arm-none-eabi)
+RUN apk update && apk add gcc-arm-none-eabi g++-arm-none-eabi
+# Python3 and Pip3
+RUN apk update && apk add python3 py3-pip py3-virtualenv py3-setuptools
+# Define workspace
+ENV WS /ws
+# Define working directory
+WORKDIR ${WS}
+# Create a non-root user and add as sudoer
+RUN adduser dev -s /bin/zsh -D && \
+    adduser dev wheel && \
+    echo "dev ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# Switch to dev user
+USER dev
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# ENV PROMPT='%n@%m %~ %# '
+CMD [ "/bin/zsh" ]
