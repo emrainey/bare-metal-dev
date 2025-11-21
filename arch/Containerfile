@@ -26,9 +26,9 @@ USER dev
 # Upgrade Pip and create virtualenv
 RUN python3 -m venv $HOME/venv
 # Create virtual environment and upgrade pip
-RUN source $HOME/venv/bin/activate && pip install --upgrade pip
+RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # ENV PROMPT='%n@%m %~ %# '
 # ENTRYPOINT [ "executable" ]
-CMD [ "/bin/zsh" ]
+CMD [ "/bin/zsh" ]x

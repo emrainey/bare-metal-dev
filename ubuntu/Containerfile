@@ -1,16 +1,41 @@
 FROM ubuntu:24.04
 
+ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.utf8
-ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
 
-# Adds some utilities to the image then
-# adds the Host compiler, and the cross compiler and distcc
+# Update the package lists
 RUN apt update
-RUN apt install -y joe vim zsh tmux screen htop git
-RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi make remake cmake mold
-RUN apt autoremove --purge -y
-RUN apt autoclean -y
-RUN rm -rf /var/cache/apt/* /tmp/*
+# Install timezone data to avoid tzdata prompt
+RUN apt-get -y install tzdata
+# Add some common basic tools and
+RUN apt install -y joe vim zsh tmux screen htop curl wget sudo openssl
+# Add some developer tools
+RUN apt install -y git cmake make ninja-build
+# adds the Host compiler, and the cross compiler
+RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi clang-20 llvm-20 lld-20 lldb-20 libc++-20-dev libc++abi-20-dev
+# Installs developer tools
+RUN apt install -y lcov gcovr doxygen graphviz
+# Add Python3 and Pip3
+RUN apt install -y python3 python3-pip python3-venv python3-setuptools
+# Clean up unnecessary packages
+RUN apt autoremove --purge -y && apt autoclean -y && rm -rf /var/cache/apt/* /tmp/*
 
-ENV HOME=/home/emrainey
-RUN useradd -s /bin/zsh -m emrainey
+# Define workspace
+ENV WS /ws
+# Define working directory
+WORKDIR ${WS}
+# Create a non-root user and add as sudoer
+RUN useradd -m -s /bin/zsh dev && \
+    echo "dev ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# Switch to dev user
+USER dev
+# Upgrade Pip and create virtualenv
+RUN python3 -m venv $HOME/venv
+# Create virtual environment and upgrade pip
+RUN . $HOME/venv/bin/activate && pip install --upgrade pip
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# ENV PROMPT='%n@%m %~ %# '
+# ENTRYPOINT [ "executable" ]
+CMD [ "/bin/zsh" ]
