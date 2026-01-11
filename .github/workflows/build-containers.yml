@@ -11,9 +11,16 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-alpine:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,7 +31,7 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -34,14 +41,17 @@ jobs:
           context: ./alpine
           file: ./alpine/Containerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-alpine:latest
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-alpine:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-alpine:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-alpine:${{ github.sha }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   build-arch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,7 +62,7 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,14 +72,17 @@ jobs:
           context: ./arch
           file: ./arch/Containerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-arch:latest
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-arch:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-arch:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-arch:${{ github.sha }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   build-ubuntu:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,7 +93,7 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -90,8 +103,8 @@ jobs:
           context: ./ubuntu
           file: ./ubuntu/Containerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-ubuntu:latest
-            ghcr.io/${{ github.repository_owner }}/bare-metal-dev-ubuntu:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-ubuntu:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-ubuntu:${{ github.sha }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
