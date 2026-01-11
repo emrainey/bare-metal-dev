@@ -11,6 +11,11 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_TAG: ${{ github.sha }}
+
 permissions:
   contents: read
   packages: write
@@ -41,8 +46,8 @@ jobs:
           context: ./alpine
           file: ./alpine/Containerfile
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-alpine:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-alpine:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-alpine:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-alpine:${{ env.IMAGE_TAG }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -72,8 +77,8 @@ jobs:
           context: ./arch
           file: ./arch/Containerfile
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-arch:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-arch:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-arch:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-arch:${{ env.IMAGE_TAG }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -103,8 +108,8 @@ jobs:
           context: ./ubuntu
           file: ./ubuntu/Containerfile
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-ubuntu:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/bare-metal-dev-ubuntu:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-ubuntu:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-ubuntu:${{ env.IMAGE_TAG }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
