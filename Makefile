@@ -8,7 +8,7 @@ clean:
 	rm -rf build/
 
 BASE:=bare-metal-dev
-IMAGES:=alpine ubuntu
+IMAGES:=alpine ubuntu # arch
 
 DOWNLOADS:=https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-aarch64.tar.gz
 

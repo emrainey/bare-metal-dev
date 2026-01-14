@@ -30,17 +30,23 @@ RUN useradd -m -s /bin/zsh dev && \
     echo "dev ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # Switch to dev user
 USER dev
-# Upgrade Pip and create virtualenv
+# Upgrade Pip and create venv folder
 RUN python3 -m venv $HOME/venv
 # Create virtual environment and upgrade pip
 RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-# COPY the install scripts in the build folder
-ADD --chown=dev:dev --chmod=0755 --exclude=*.txt build/ /downloads/
+# Extract the archives into the /external directory
+ADD --chown=dev:dev --chmod=0755 build/*.tar.gz /external/
+# Add the build script to /external and run it
 ADD --chown=dev:dev --chmod=0755 build.sh /external/
 RUN /external/build.sh
-# ENV PROMPT='%n@%m %~ %# '
+# Add /external/bin to PATH so that the collapsed install trees are accessible
 ENV PATH="/external/bin:$PATH"
+# The library path for collapsed install trees, but LD_LIBRARY_PATH is not setup by default
+ENV LD_LIBRARY_PATH="/external/lib"
+# Update the dynamic linker run-time bindings
+RUN sudo /sbin/ldconfig
+# ENV PROMPT='%n@%m %~ %# '
 # ENTRYPOINT [ "executable" ]
 CMD [ "/bin/zsh" ]
