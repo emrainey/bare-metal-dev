@@ -8,12 +8,29 @@ clean:
 	rm -rf build/
 
 BASE:=bare-metal-dev
-IMAGES:=alpine arch ubuntu
+IMAGES:=alpine ubuntu
+
+DOWNLOADS:=https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-aarch64.tar.gz
+
+# $1 is the notdir name of the file
+# $2 is the URL of the file
+define download_dependency
+build/$(1):
+	mkdir -p build
+	curl -L $(2) -o $$@
+	chmod +x $$@
+endef
+
+# Target dependencies depends on all the scripts being downloaded
+dependencies: $(foreach dep,$(DOWNLOADS),build/$(notdir $(dep)))
+
+# Each script is based on the corresponding download URL
+$(foreach dep,$(DOWNLOADS),$(eval $(call download_dependency,$(notdir $(dep)),$(dep))))
 
 define build_image
-build/$(1)_image_inspect.txt: $(1)/Containerfile
+build/$(1)_image_inspect.txt: Containerfile.$(1) dependencies
 	mkdir -p build
-	$(DOCKER) build $(1) -f $$< --tag $(BASE)-$(1)
+	$(DOCKER) build . -f $$< --tag $(BASE)-$(1)
 	$(DOCKER) inspect $(BASE)-$(1) > build/$(1)_image_inspect.txt
 
 build:: build/$(1)_image_inspect.txt

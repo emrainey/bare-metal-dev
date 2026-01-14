@@ -1,4 +1,8 @@
-FROM archlinux/archlinux:latest
+ARG TARGETARCH
+FROM --platform=$TARGETARCH archlinux/archlinux:latest AS base-amd64
+FROM --platform=$TARGETARCH agners/archlinuxarm:latest AS base-arm64
+
+FROM base-${TARGETARCH} AS final
 # Update pacman and install a package (e.g., git)
 RUN pacman --sync --refresh --sysupgrade --noconfirm
 # Common Tools and Libraries

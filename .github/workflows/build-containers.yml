@@ -43,8 +43,8 @@ jobs:
       - name: Build and push Alpine container
         uses: docker/build-push-action@v5
         with:
-          context: ./alpine
-          file: ./alpine/Containerfile
+          context: .
+          file: ./Containerfile.alpine
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-alpine:latest
@@ -75,8 +75,8 @@ jobs:
       - name: Build and push Arch container
         uses: docker/build-push-action@v5
         with:
-          context: ./arch
-          file: ./arch/Containerfile
+          context: .
+          file: ./Containerfile.arch
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-arch:latest
@@ -107,8 +107,8 @@ jobs:
       - name: Build and push Ubuntu container
         uses: docker/build-push-action@v5
         with:
-          context: ./ubuntu
-          file: ./ubuntu/Containerfile
+          context: .
+          file: ./Containerfile.ubuntu
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-ubuntu:latest
