@@ -40,10 +40,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download the CMake tar-ball
-        run: |
-          curl -L https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-x86_64.tar.gz -o build/cmake-4.2.1-linux-x86_64.tar.gz
-
       - name: Build and push Alpine container
         uses: docker/build-push-action@v5
         with:
@@ -75,6 +71,11 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download the CMake tar-ball
+        run: |
+          mkdir -p build
+          curl -L https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-x86_64.tar.gz -o build/cmake-4.2.1-linux-x86_64.tar.gz
 
       - name: Build and push Arch container
         uses: docker/build-push-action@v5
