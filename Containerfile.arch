@@ -4,21 +4,21 @@ FROM --platform=$TARGETARCH agners/archlinuxarm:latest AS base-arm64
 
 FROM base-${TARGETARCH} AS final
 # Update pacman and install a package (e.g., git)
-RUN pacman --sync --refresh --sysupgrade --noconfirm
+RUN pacman --sync --refresh --sysupgrade --noconfirm --disable-sandbox
 # Common Tools and Libraries
-RUN pacman --sync --refresh --noconfirm htop tree tmux screen vim nano screen curl wget openssl bash zsh sudo
+RUN pacman --sync --refresh --noconfirm --disable-sandbox htop tree tmux screen vim nano screen curl wget openssl bash zsh sudo
 # Compilers & Debuggers (Host)
-RUN pacman --sync --refresh --noconfirm gcc gdb cgdb llvm lldb openmp
+RUN pacman --sync --refresh --noconfirm --disable-sandbox gcc gdb cgdb llvm lldb openmp
 # Compilers & Debuggers (ARM)
-RUN pacman --sync --refresh --noconfirm arm-none-eabi-gcc arm-none-eabi-gdb arm-none-eabi-newlib
+RUN pacman --sync --refresh --noconfirm --disable-sandbox arm-none-eabi-gcc arm-none-eabi-gdb arm-none-eabi-newlib
 # Dev tools
-RUN pacman --sync --refresh --noconfirm lcov doxygen graphviz git cmake make ninja
+RUN pacman --sync --refresh --noconfirm --disable-sandbox lcov doxygen graphviz git cmake make ninja
 # Python3 and Pip3
-RUN pacman --sync --refresh --noconfirm python python-pip python-virtualenv
+RUN pacman --sync --refresh --noconfirm --disable-sandbox python python-pip python-virtualenv
 # Remove all the packages
-RUN pacman --sync --clean --noconfirm
+RUN pacman --sync --clean --noconfirm --disable-sandbox
 # Define workspace
-ENV WS /ws
+ENV WS=/ws
 # Define working directory
 WORKDIR ${WS}
 # Create a non-root user and add as sudoer
@@ -35,4 +35,4 @@ RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # ENV PROMPT='%n@%m %~ %# '
 # ENTRYPOINT [ "executable" ]
-CMD [ "/bin/zsh" ]x
+CMD [ "/bin/zsh" ]
