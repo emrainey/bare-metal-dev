@@ -13,7 +13,7 @@ RUN apt install -y joe vim zsh tmux screen htop curl wget sudo openssl
 # Add some developer tools
 RUN apt install -y git cmake make ninja-build
 # adds the Host compiler, and the cross compiler
-RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi clang-20 llvm-20 lld-20 lldb-20 libc++-20-dev libc++abi-20-dev
+RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi clang-20 llvm-20 lld-20 lldb-20 libc++-20-dev libc++abi-20-dev libssl-dev
 # Installs developer tools
 RUN apt install -y lcov gcovr doxygen graphviz
 # Add Python3 and Pip3
@@ -36,11 +36,14 @@ RUN python3 -m venv $HOME/venv
 RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN sudo mkdir -p /external/src
+RUN sudo chmod -R 777 /external
+RUN sudo chown -R dev:dev /external
 # Extract the archives into the /external directory
-ADD --chown=dev:dev --chmod=0755 build/*.tar.gz /external/
+ADD git@github.com:Kitware/CMake.git#v4.2.1 /external/src/cmake
 # Add the build script to /external and run it
 ADD --chown=dev:dev --chmod=0755 build.sh /external/
-RUN /external/build.sh
+RUN sudo /external/build.sh
 # Add /external/bin to PATH so that the collapsed install trees are accessible
 ENV PATH="/external/bin:$PATH"
 # The library path for collapsed install trees, but LD_LIBRARY_PATH is not setup by default

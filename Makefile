@@ -10,7 +10,9 @@ clean:
 BASE:=bare-metal-dev
 IMAGES:=alpine ubuntu # arch
 
-DOWNLOADS:=https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-aarch64.tar.gz
+# Moved the CMake download to individual Containerfiles
+# as the Github workflow kept failing. This path is here in case something else breaks.
+DOWNLOADS:=
 
 # $1 is the notdir name of the file
 # $2 is the URL of the file
@@ -30,7 +32,7 @@ $(foreach dep,$(DOWNLOADS),$(eval $(call download_dependency,$(notdir $(dep)),$(
 define build_image
 build/$(1)_image_inspect.txt: Containerfile.$(1) dependencies
 	mkdir -p build
-	$(DOCKER) build . -f $$< --tag $(BASE)-$(1)
+	$(DOCKER) build . --ssh default -f $$< --tag $(BASE)-$(1)
 	$(DOCKER) inspect $(BASE)-$(1) > build/$(1)_image_inspect.txt
 
 build:: build/$(1)_image_inspect.txt
