@@ -110,6 +110,7 @@ jobs:
           context: .
           file: ./Containerfile.ubuntu
           platforms: linux/amd64,linux/arm64
+          ssh: default
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-ubuntu:latest
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-ubuntu:${{ env.IMAGE_TAG }}
