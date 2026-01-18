@@ -1,7 +1,7 @@
 FROM debian:stable-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV LANG=en_US.utf8
+ENV LANG=en_US.UTF-8
 ENV TZ=Etc/UTC
 
 # Update the package lists

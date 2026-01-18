@@ -4,9 +4,6 @@ DOCKER:=$(firstword $(shell which docker) $(shell which finch))
 
 all: build
 
-clean:
-	rm -rf build/
-
 BASE:=bare-metal-dev
 IMAGES:=alpine debian ubuntu # arch # (problem child!)
 
@@ -33,7 +30,7 @@ define build_image
 build/$(1)_image_inspect.txt: Containerfile.$(1) dependencies
 	mkdir -p build
 	$(DOCKER) build . -f $$< --tag $(BASE)-$(1)
-	$(DOCKER) inspect $(BASE)-$(1) > build/$(1)_image_inspect.txt
+	$(DOCKER) inspect $(BASE)-$(1) > $$@
 
 build:: build/$(1)_image_inspect.txt
 endef
@@ -46,5 +43,12 @@ build/$(1)_run_output.txt: build/$(1)_image_inspect.txt
 run:: build/$(1)_run_output.txt
 endef
 
+define clean_image
+clean::
+	-$(DOCKER) rmi $(BASE)-$(1)
+	-rm -rf build/$(1)_image_inspect.txt build/$(1)_run_output.txt
+endef
+
 $(foreach img,$(IMAGES),$(eval $(call build_image,$(img))))
 $(foreach img,$(IMAGES),$(eval $(call run_image,$(img))))
+$(foreach img,$(IMAGES),$(eval $(call clean_image,$(img))))
