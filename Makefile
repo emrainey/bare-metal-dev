@@ -8,7 +8,7 @@ clean:
 	rm -rf build/
 
 BASE:=bare-metal-dev
-IMAGES:=alpine ubuntu # arch
+IMAGES:=alpine debian ubuntu # arch # (problem child!)
 
 # Moved the CMake download to individual Containerfiles
 # as the Github workflow kept failing. This path is here in case something else breaks.

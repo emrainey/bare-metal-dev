@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM debian:stable-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.utf8
@@ -9,11 +9,11 @@ RUN apt update
 # Install timezone data to avoid tzdata prompt
 RUN apt-get -y install tzdata
 # Add some common basic tools and
-RUN apt install -y joe vim zsh tmux screen htop curl wget sudo openssl
+RUN apt install -y joe vim zsh tmux screen htop curl wget sudo openssl openssh-client openssh-server
 # Add some developer tools
 RUN apt install -y git cmake make ninja-build
 # adds the Host compiler, and the cross compiler
-RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi clang-20 llvm-20 lld-20 lldb-20 libc++-20-dev libc++abi-20-dev libssl-dev
+RUN apt install -y gcc-13 g++-13 gcc-arm-none-eabi clang-19 clangd-19 llvm-19 lld-19 lldb-19 libc++-19-dev libc++abi-19-dev libssl-dev
 # Installs developer tools
 RUN apt install -y lcov gcovr doxygen graphviz
 # Add Python3 and Pip3
@@ -37,14 +37,14 @@ RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # Add the build script to /external and run it
-ADD --chown=dev:dev --chmod=0755 build.sh /external/
-RUN sudo /external/build.sh
+# ADD --chown=dev:dev --chmod=0755 build.sh /external/
+# RUN sudo /external/build.sh
 # Add /external/bin to PATH so that the collapsed install trees are accessible
-ENV PATH="/external/bin:$PATH"
+# ENV PATH="/external/bin:$PATH"
 # The library path for collapsed install trees, but LD_LIBRARY_PATH is not setup by default
-ENV LD_LIBRARY_PATH="/external/lib"
+# ENV LD_LIBRARY_PATH="/external/lib"
 # Update the dynamic linker run-time bindings
-RUN sudo /sbin/ldconfig
+# RUN sudo /sbin/ldconfig
 # ENV PROMPT='%n@%m %~ %# '
 # ENTRYPOINT [ "executable" ]
 CMD [ "/bin/zsh" ]
