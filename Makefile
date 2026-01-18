@@ -32,7 +32,7 @@ $(foreach dep,$(DOWNLOADS),$(eval $(call download_dependency,$(notdir $(dep)),$(
 define build_image
 build/$(1)_image_inspect.txt: Containerfile.$(1) dependencies
 	mkdir -p build
-	$(DOCKER) build . --ssh default -f $$< --tag $(BASE)-$(1)
+	$(DOCKER) build . -f $$< --tag $(BASE)-$(1)
 	$(DOCKER) inspect $(BASE)-$(1) > build/$(1)_image_inspect.txt
 
 build:: build/$(1)_image_inspect.txt
