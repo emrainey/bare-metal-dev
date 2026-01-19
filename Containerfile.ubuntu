@@ -42,7 +42,7 @@ RUN . $HOME/venv/bin/activate && pip install --upgrade pip
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # Add the build script to /external and run it
 ADD --chown=dev:dev --chmod=0755 build.sh /external/
-RUN sudo /external/build.sh
+RUN /external/build.sh
 # Add /external/bin to PATH so that the collapsed install trees are accessible
 ENV PATH="/external/bin:$PATH"
 # The library path for collapsed install trees, but LD_LIBRARY_PATH is not setup by default
