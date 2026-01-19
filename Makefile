@@ -4,6 +4,7 @@ DOCKER:=$(firstword $(shell which docker) $(shell which finch))
 
 all: build
 
+REGISTRY:=ghcr.io/emrainey
 BASE:=bare-metal-dev
 IMAGES:=alpine debian ubuntu # arch # (problem child!)
 
