@@ -14,6 +14,10 @@ A collection of containers used to build embedded projects using:
 * OpenOCD for on-chip debugging
 * Python for build shenanigans
 
+## Note on Vendor Tools
+
+Vendor specific tools will have to be added by *you* as there's normally an EULA preventing redistribution.
+
 ## Finch
 
 ```bash
