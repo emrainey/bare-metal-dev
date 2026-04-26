@@ -1,6 +1,6 @@
 FROM alpine:latest
 # Common Tools and Libraries
-RUN apk update && apk add sudo tmux vim joe screen htop ncurses zsh curl wget openssl openssh-client bash zsh
+RUN apk update && apk add sudo tmux vim joe screen htop ncurses zsh curl wget openssl openssh-client bash
 # Dev Tools
 RUN apk update && apk add git make cmake samurai musl-dev openocd
 # Dev Adjacent Tools
@@ -22,6 +22,8 @@ RUN adduser dev -s /bin/zsh -D && \
 ENV WS=/ws
 # Create the workspace directory
 RUN mkdir -p ${WS} && chown dev:dev ${WS} && chmod 777 ${WS}
+# Catalog all installed packages
+RUN apk info -v > /etc/image-catalog.txt
 # Define working directory
 WORKDIR ${WS}
 # Switch to dev user
@@ -30,6 +32,8 @@ USER dev
 RUN python3 -m venv $HOME/venv
 # Create virtual environment and upgrade pip
 RUN . $HOME/venv/bin/activate && pip install --upgrade pip
+# Catalog pip packages
+RUN . $HOME/venv/bin/activate && printf '\n[pip]\n' >> /etc/image-catalog.txt && pip list --format=columns >> /etc/image-catalog.txt
 # Install Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 CMD [ "/bin/zsh" ]

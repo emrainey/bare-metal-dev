@@ -1,12 +1,10 @@
-ARG TARGETARCH
-FROM --platform=$TARGETARCH archlinux/archlinux:latest AS base-amd64
-FROM --platform=$TARGETARCH agners/archlinuxarm:latest AS base-arm64
-
-FROM base-${TARGETARCH} AS final
+FROM archlinux/archlinux:latest
+# Disable pacman's Landlock sandbox (not supported under Docker Desktop / QEMU emulation)
+RUN sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
 # Update pacman and install a package (e.g., git)
 RUN pacman --sync --refresh --sysupgrade --noconfirm
 # Common Tools and Libraries
-RUN pacman --sync --refresh --noconfirm htop tree tmux screen vim nano screen curl wget openssl bash zsh sudo
+RUN pacman --sync --refresh --noconfirm htop tree tmux screen vim nano curl wget openssl bash zsh sudo
 # Compilers & Debuggers (Host)
 RUN pacman --sync --refresh --noconfirm gcc gdb cgdb llvm lldb openmp
 # Compilers & Debuggers (ARM)
@@ -26,12 +24,18 @@ RUN useradd -m -s /bin/zsh dev && \
 ENV WS=/ws
 # Create the workspace directory
 RUN mkdir -p ${WS} && chown dev:dev ${WS} && chmod 777 ${WS}
+# Catalog all installed packages
+RUN pacman -Q > /etc/image-catalog.txt
 # Define working directory
 WORKDIR ${WS}
+# Switch to dev user
+USER dev
 # Upgrade Pip and create virtualenv folder
 RUN python3 -m venv $HOME/venv
 # Create virtual environment and upgrade pip
 RUN . $HOME/venv/bin/activate && pip install --upgrade pip
+# Catalog pip packages
+RUN . $HOME/venv/bin/activate && printf '\n[pip]\n' >> /etc/image-catalog.txt && pip list --format=columns >> /etc/image-catalog.txt
 # Install Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 CMD [ "/bin/zsh" ]

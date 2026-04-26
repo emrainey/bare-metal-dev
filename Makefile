@@ -1,4 +1,4 @@
-.PHONY: all clean build run
+.PHONY: all clean build run catalog
 
 DOCKER:=$(firstword $(shell which docker) $(shell which finch))
 
@@ -6,7 +6,7 @@ all: build
 
 REGISTRY:=ghcr.io/emrainey
 BASE:=bare-metal-dev
-IMAGES:=alpine debian ubuntu # arch # (problem child!)
+IMAGES:=alpine debian ubuntu arch
 
 # Moved the CMake download to individual Containerfiles
 # as the Github workflow kept failing. This path is here in case something else breaks.
@@ -27,13 +27,14 @@ dependencies: $(foreach dep,$(DOWNLOADS),build/$(notdir $(dep)))
 # Each script is based on the corresponding download URL
 $(foreach dep,$(DOWNLOADS),$(eval $(call download_dependency,$(notdir $(dep)),$(dep))))
 
+# $1 = image name, $2 = optional extra build flags (e.g. --platform)
 define build_image
 build/$(1)_image_inspect.txt: Containerfile.$(1) dependencies
 	mkdir -p build
-	$(DOCKER) build . -f $$< --tag $(BASE)-$(1)
+	$(DOCKER) build . -f $$< --tag $(BASE)-$(1) $(2)
 	$(DOCKER) inspect $(BASE)-$(1) > $$@
 
-build:: build/$(1)_image_inspect.txt
+build:: build/$(1)_image_inspect.txt build/$(1)_catalog.txt
 endef
 
 define run_image
@@ -44,12 +45,21 @@ build/$(1)_run_output.txt: build/$(1)_image_inspect.txt
 run:: build/$(1)_run_output.txt
 endef
 
+define catalog_image
+build/$(1)_catalog.txt: build/$(1)_image_inspect.txt
+	mkdir -p build
+	$(DOCKER) run --rm $(BASE)-$(1) cat /etc/image-catalog.txt > build/$(1)_catalog.txt
+
+catalog:: build/$(1)_catalog.txt
+endef
+
 define clean_image
 clean::
 	-$(DOCKER) rmi $(BASE)-$(1)
-	-rm -rf build/$(1)_image_inspect.txt build/$(1)_run_output.txt
+	-rm -rf build/$(1)_image_inspect.txt build/$(1)_run_output.txt build/$(1)_catalog.txt
 endef
 
 $(foreach img,$(IMAGES),$(eval $(call build_image,$(img))))
 $(foreach img,$(IMAGES),$(eval $(call run_image,$(img))))
+$(foreach img,$(IMAGES),$(eval $(call catalog_image,$(img))))
 $(foreach img,$(IMAGES),$(eval $(call clean_image,$(img))))
