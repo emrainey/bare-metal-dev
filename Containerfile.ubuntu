@@ -19,6 +19,7 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get install -y --no-install-recommends \
         gcc-15 g++-15 gcc-arm-none-eabi gdb gdbserver cgdb \
+        libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
         clang-20 clangd-20 llvm-20 lld-20 lldb-20 libc++-20-dev libc++abi-20-dev libssl-dev && \
     apt-get clean && \
     apt-get install -y --no-install-recommends \

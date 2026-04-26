@@ -16,6 +16,7 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get install -y --no-install-recommends \
         gcc-13 g++-13 gcc-arm-none-eabi gdb gdbserver cgdb \
+        libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
         clang-19 clangd-19 llvm-19 lld-19 lldb-19 libc++-19-dev libc++abi-19-dev libssl-dev && \
     apt-get clean && \
     apt-get install -y --no-install-recommends \
