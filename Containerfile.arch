@@ -26,6 +26,7 @@ ENV WS=/ws
 RUN mkdir -p ${WS} && chown dev:dev ${WS} && chmod 777 ${WS}
 # Catalog all installed packages
 RUN pacman -Q > /etc/image-catalog.txt
+RUN chmod 666 /etc/image-catalog.txt
 # Define working directory
 WORKDIR ${WS}
 # Switch to dev user
